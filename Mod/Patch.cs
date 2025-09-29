@@ -52,6 +52,7 @@ namespace Lilly.PlantsPatch
         //[HarmonyPostfix]
 
         public static Dictionary<string, MyPlant> treeBackup = new Dictionary<string, MyPlant>();
+        public static Dictionary<string, string> names= new Dictionary<string, string>();
 
         /// <summary>
         /// 변경하면 안되는 백업본
@@ -61,12 +62,15 @@ namespace Lilly.PlantsPatch
             foreach (var def in DefDatabase<ThingDef>.AllDefs)
             {
                 if (def.plant != null && def.plant.IsTree)
-                {
+                {                    
                     // def.plant.growDays 
                     // def.plant.harvestYield
                     MyPlant value = new MyPlant(def.plant);
-                    treeBackup.Add(def.defName, value);                   
+                    treeBackup.Add(def.defName, value);
                     MyLog.Message($"TreeBackup {def.defName} {value}");
+                    ThingDef tdef = DefDatabase<ThingDef>.GetNamed(def.defName);
+                    names.Add(tdef.defName, tdef.label.CapitalizeFirst());                   
+                    MyLog.Message($"TreeBackup {def.defName} {tdef.label.CapitalizeFirst()}");
                 }
             }
             MyLog.Message($"TreeBackup {treeBackup.Count}");
@@ -76,7 +80,7 @@ namespace Lilly.PlantsPatch
         /// <summary>
         /// 실제 게임에 변경한 값 적용
         /// </summary>
-        public static void TreePatch()
+        public static void TreePatch(MyPlant m=null )
         {
             foreach (var def in DefDatabase<ThingDef>.AllDefs)
             {
@@ -85,9 +89,10 @@ namespace Lilly.PlantsPatch
                     // def.plant.growDays 
                     // def.plant.harvestYield
                     MyLog.Message($"TreePatch 1 {def.defName}");
+                    // 설정값 얻기
                     if (Settings.treeSetup.TryGetValue(def.defName, out MyPlant myPlant))
                     {
-                        myPlant.Apply(def.plant);
+                        myPlant.ApplyTo(def.plant);
                         MyLog.Message($"TreePatch 2 {def.defName} {myPlant}");
                     }
                     //else

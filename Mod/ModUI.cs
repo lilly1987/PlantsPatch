@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HarmonyLib;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime;
@@ -32,6 +33,21 @@ namespace Lilly.PlantsPatch
         Vector2 scrollPosition;
         string tmp;
 
+        // 버튼 정의: 텍스트와 multiplier (null은 기본값 적용)
+        (string label, float multiplier)[] buttons = new[]
+{
+                ("x16", 16f),
+                ("x4", 4f),
+                ("x1", 1f),
+                ("/4", 0.25f),
+                ("/16", 0.0625f),
+                ("x16", 16f),
+                ("x4", 4f),
+                ("x1", 1f),
+                ("/4", 0.25f),
+                ("/16", 0.0625f)
+            };
+
         // 매 프레임마다 호출됨
         public override void DoSettingsWindowContents(Rect inRect)
         {
@@ -53,9 +69,102 @@ namespace Lilly.PlantsPatch
             listing.CheckboxLabeled($"Debug", ref Settings.onDebug);
             //listing.CheckboxLabeled($"on Patch", ref Settings.onPatch);
 
+            listing.GapLine();
+
+            Rect rowRect = listing.GetRect(30f);
+            float colWidth = rowRect.width / 3f;
+            float colWidth2 = colWidth / 5f;
+
+            Widgets.Label(new Rect(rowRect.x, rowRect.y, colWidth, rowRect.height), "일괄 적용".Translate());
+
+            // 버튼 출력
+            for (int i = 0; i <5; i++)
+            {
+                float x = rowRect.x + colWidth + colWidth2 * i;
+                Rect buttonRect = new Rect(x, rowRect.y, colWidth2, rowRect.height);
+
+                if (Widgets.ButtonText(buttonRect, buttons[i].label))
+                {
+                    //if (buttons[i].multiplier.HasValue)
+                        Settings.TreeApply(new MyPlant(buttons[i].multiplier));
+                    //else
+                        //Settings.TreeApply();
+                }
+            }
+            for (int i = 5; i < 10; i++)
+            {
+                float x = rowRect.x + colWidth + colWidth2 * i;
+                Rect buttonRect = new Rect(x, rowRect.y, colWidth2, rowRect.height);
+
+                if (Widgets.ButtonText(buttonRect, buttons[i].label))
+                {
+                    //if (buttons[i].multiplier.HasValue)
+                        Settings.TreeApply(new MyPlant(harvestYield: buttons[i].multiplier));
+                    //else
+                        //Settings.TreeApply();
+                }
+            }
+
+            rowRect = listing.GetRect(30f);
+
+            if (Widgets.ButtonText(new Rect(rowRect.x + colWidth, rowRect.y, colWidth2, rowRect.height), "x16"))
+            {
+                Settings.TreeApply(new MyPlant(16f));
+            }
+            if(Widgets.ButtonText(new Rect(rowRect.x + colWidth+ colWidth2, rowRect.y, colWidth2, rowRect.height), "x4"))
+            {
+                Settings.TreeApply(new MyPlant(4f));
+            }
+            if(Widgets.ButtonText(new Rect(rowRect.x + colWidth + colWidth2 * 2, rowRect.y, colWidth2, rowRect.height), "x1"))
+            {
+                Settings.TreeApply();
+            }
+            if(Widgets.ButtonText(new Rect(rowRect.x + colWidth + colWidth2*3, rowRect.y, colWidth2, rowRect.height), "/4"))
+            {
+                Settings.TreeApply(new MyPlant(1f/4f));
+            }
+            if(Widgets.ButtonText(new Rect(rowRect.x + colWidth + colWidth2*4, rowRect.y, colWidth2, rowRect.height), "/16"))
+            {
+                Settings.TreeApply(new MyPlant(1f/16f));
+            }
+
+            if(Widgets.ButtonText(new Rect(rowRect.x + colWidth + colWidth2 * 5, rowRect.y, colWidth2, rowRect.height), "x16"))
+            {
+                Settings.TreeApply(new MyPlant(harvestYield: 16f));
+            }
+            if(Widgets.ButtonText(new Rect(rowRect.x + colWidth + colWidth2*6, rowRect.y, colWidth2, rowRect.height), "x4"))
+            {
+                Settings.TreeApply(new MyPlant(harvestYield: 4f));
+            }
+            if(Widgets.ButtonText(new Rect(rowRect.x + colWidth + colWidth2 *7, rowRect.y, colWidth2, rowRect.height), "x1"))
+            {
+                Settings.TreeApply();
+            }
+            if(Widgets.ButtonText(new Rect(rowRect.x + colWidth + colWidth2*8, rowRect.y, colWidth2, rowRect.height), "/4"))
+            {
+                Settings.TreeApply(new MyPlant(harvestYield: 1f /4f));
+            }
+            if(Widgets.ButtonText(new Rect(rowRect.x + colWidth + colWidth2*9, rowRect.y, colWidth2, rowRect.height), "/16"))
+            {
+                Settings.TreeApply(new MyPlant(harvestYield: 1f /16f));
+            }
+
+            listing.GapLine();
+            
+            // 한 줄 높이의 Rect 확보
+            rowRect = listing.GetRect(30f);
+
+            // 열 너비 계산 (3등분)
+
+            Widgets.Label(new Rect(rowRect.x, rowRect.y, colWidth, rowRect.height), "이름".Translate());
+            Widgets.Label(new Rect(rowRect.x + colWidth, rowRect.y, colWidth, rowRect.height), "성장일".Translate());
+            Widgets.Label(new Rect(rowRect.x + colWidth*2, rowRect.y, colWidth, rowRect.height), "수급량".Translate());
+
+            // ---------
+
             foreach (KeyValuePair<string, MyPlant> item in Settings.treeSetup)
             {
-                TextFieldNumeric(listing, item);
+                TextFieldNumeric(listing, item, colWidth);
             }
 
             // ---------
@@ -66,7 +175,7 @@ namespace Lilly.PlantsPatch
 
             Widgets.EndScrollView();
 
-            MyLog.Message($"ED");
+            //MyLog.Message($"ED");
         }
 
         public override string SettingsCategory()
@@ -74,43 +183,48 @@ namespace Lilly.PlantsPatch
             return "Plants Patch".Translate();
         }
 
-        public void TextFieldNumeric(Listing_Standard listing,  KeyValuePair<string, MyPlant> num)
+        public void TextFieldNumeric(Listing_Standard listing,  KeyValuePair<string, MyPlant> num, float colWidth)
         {
             // 한 줄 높이의 Rect 확보
-            //Rect rowRect = listing.GetRect(30f);
-            //// 열 너비 계산 (3등분)
-            //float colWidth = rowRect.width / 3f;
+            Rect rowRect = listing.GetRect(30f);
 
-            //Widgets.Label(new Rect(rowRect.x, rowRect.y, colWidth, rowRect.height), num.Key.Translate());
+            if (Patch.names.TryGetValue(num.Key,out var value ))
+            {
+                Widgets.Label(new Rect(rowRect.x, rowRect.y, colWidth, rowRect.height), value);
+            }else
+            {
+                Widgets.Label(new Rect(rowRect.x, rowRect.y, colWidth, rowRect.height), num.Key.Translate());
+            }
 
-            //// 두 번째 열: growDays 입력 필드
-            //string growStr = num.Value.growDays.ToString();
-            //Widgets.TextFieldNumeric(
-            //    new Rect(rowRect.x + colWidth, rowRect.y, colWidth, rowRect.height),
-            //    ref num.Value.growDays,
-            //    ref growStr,
-            //    1f, 100f
-            //);
+            // 두 번째 열: growDays 입력 필드
+            string growStr = num.Value.growDays.ToString();
+            Widgets.TextFieldNumeric(
+                new Rect(rowRect.x + colWidth, rowRect.y, colWidth, rowRect.height),
+                ref num.Value.growDays,
+                ref growStr,
+                1f, 100f
+            );
 
-            //// 세 번째 열: harvestYield 입력 필드
-            //string yieldStr = num.Value.harvestYield.ToString();
-            //Widgets.TextFieldNumeric(
-            //    new Rect(rowRect.x + colWidth * 2, rowRect.y, colWidth, rowRect.height),
-            //    ref num.Value.harvestYield,
-            //    ref yieldStr,
-            //    1f, 100f
-            //);
+            // 세 번째 열: harvestYield 입력 필드
+            string yieldStr = num.Value.harvestYield.ToString();
+            Widgets.TextFieldNumeric(
+                new Rect(rowRect.x + colWidth * 2, rowRect.y, colWidth, rowRect.height),
+                ref num.Value.harvestYield,
+                ref yieldStr,
+                1f, 100f
+            );
 
             //Widgets.Label(listing.GetRect(30f), num.Key.Translate());
             //Widgets.TextFieldNumericLabeled(listing.GetRect(30f),"성장일", ref num.Value.growDays, ref tmp);
             //Widgets.TextFieldNumericLabeled(listing.GetRect(30f),"수확량", ref num.Value.harvestYield, ref tmp);
 
-            listing.Label(num.Key.Translate());
-            tmp = num.Value.growDays.ToString();
-            listing.TextFieldNumeric(ref num.Value.growDays, ref tmp);
-            listing.TextFieldNumericLabeled("성장일", ref num.Value.growDays, ref tmp);
-            tmp = num.Value.harvestYield.ToString();
-            listing.TextFieldNumeric(ref num.Value.harvestYield, ref tmp);
+            /*            listing.Label(num.Key.Translate());
+                        tmp = num.Value.growDays.ToString();
+                        //listing.TextFieldNumeric(ref num.Value.growDays, ref tmp);
+                        listing.TextFieldNumericLabeled("성장일", ref num.Value.growDays, ref tmp);
+                        tmp = num.Value.harvestYield.ToString();
+                        //listing.TextFieldNumeric(ref num.Value.harvestYield, ref tmp);
+                        listing.TextFieldNumericLabeled("수급량", ref num.Value.harvestYield, ref tmp);*/
         }
 
         public void TextFieldNumeric<T>(Listing_Standard listing, ref T num, string label = "", string tipSignal = "") where T : struct

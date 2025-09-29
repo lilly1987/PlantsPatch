@@ -46,6 +46,26 @@ namespace Lilly.PlantsPatch
         }
 
         /// <summary>
+        /// 기본값에서 배율 적용
+        /// </summary>
+        /// <param name="m"></param>
+        public static void TreeApply(MyPlant m=null)
+        {
+            if (m == null)
+            {
+                foreach (var kv in Patch.treeBackup)
+                {
+                    treeSetup[kv.Key] = Patch.treeBackup[kv.Key];
+                }
+            }
+            else
+                foreach (var kv in Patch.treeBackup)                
+                {
+                    treeSetup[kv.Key] = Patch.treeBackup[kv.Key]* m;
+                }
+        }
+
+        /// <summary>
         /// UI 목록 표시용
         /// </summary>
         public static void TreeSetup()
