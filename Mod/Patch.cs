@@ -53,6 +53,9 @@ namespace Lilly.PlantsPatch
 
         public static Dictionary<string, MyPlant> treeBackup = new Dictionary<string, MyPlant>();
 
+        /// <summary>
+        /// 변경하면 안되는 백업본
+        /// </summary>
         public static void TreeBackup()
         {
             foreach (var def in DefDatabase<ThingDef>.AllDefs)
@@ -66,9 +69,13 @@ namespace Lilly.PlantsPatch
                     MyLog.Message($"TreeBackup {def.defName} {value}");
                 }
             }
+            MyLog.Message($"TreeBackup {treeBackup.Count}");
 
         }
 
+        /// <summary>
+        /// 실제 게임에 변경한 값 적용
+        /// </summary>
         public static void TreePatch()
         {
             foreach (var def in DefDatabase<ThingDef>.AllDefs)
@@ -77,11 +84,11 @@ namespace Lilly.PlantsPatch
                 {
                     // def.plant.growDays 
                     // def.plant.harvestYield
-                    MyLog.Message($"TreeBackup {def.defName} {def.plant.growDays}");
-                    if (treeBackup.TryGetValue(def.defName, out MyPlant myPlant))
+                    MyLog.Message($"TreePatch 1 {def.defName}");
+                    if (Settings.treeSetup.TryGetValue(def.defName, out MyPlant myPlant))
                     {
                         myPlant.Apply(def.plant);
-                        MyLog.Message($"TreePatch {def.defName} {def.plant}");
+                        MyLog.Message($"TreePatch 2 {def.defName} {myPlant}");
                     }
                     //else
                     //{

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Verse;
 
 namespace Lilly.PlantsPatch
@@ -10,24 +11,46 @@ namespace Lilly.PlantsPatch
         //public static int maxFishPopulation = 1000000;
 
         public static Dictionary<string, MyPlant> treeSetup = new Dictionary<string, MyPlant>();
+        private List<TreeSetupEntry> treeSetupList = new List<TreeSetupEntry>();
 
+        // LoadingVars
+        // ResolvingCrossRefs
+        // PostLoadInit
         public override void ExposeData()
         {
+            MyLog.Message($"<color=#00FF00FF>{Scribe.mode}</color>");
             if (Scribe.mode != LoadSaveMode.LoadingVars && Scribe.mode != LoadSaveMode.Saving) return;
 
-            MyLog.Message($"<color=#00FF00FF>{Scribe.mode}</color>");
             base.ExposeData();
+
             Scribe_Values.Look(ref onDebug, "onDebug", false);
             //Scribe_Values.Look(ref onPatch, "onPatch", true);
-            
-            Scribe_Values.Look<Dictionary<string, MyPlant>>(ref treeSetup, "treeSetup");
 
+            //Scribe_Values.Look<Dictionary<string, MyPlant>>(ref treeSetup, "treeSetup");
+            if (Scribe.mode == LoadSaveMode.Saving)
+            {
+                MyLog.Message($"treeSetup {treeSetup.Count}");
+                treeSetupList= treeSetup.Select(kv => new TreeSetupEntry() { defName = kv.Key, plant = kv.Value }).ToList();
+                MyLog.Message($"treeSetupList {treeSetupList.Count}");
+                Patch.TreePatch();
+            }
+            Scribe_Collections.Look(ref treeSetupList, "treeSetup", LookMode.Deep);
+            if (Scribe.mode == LoadSaveMode.LoadingVars)
+            {
+                MyLog.Message($"treeSetupList {treeSetupList.Count}");
+                treeSetup = treeSetupList.ToDictionary(entry => entry.defName, entry => entry.plant);
+                MyLog.Message($"treeSetup {treeSetup.Count}");
+                Patch.TreePatch();
+            }
 
-            Patch.TreePatch();
         }
 
+        /// <summary>
+        /// UI 목록 표시용
+        /// </summary>
         public static void TreeSetup()
         {
+            MyLog.Message($"treeBackup {Patch.treeBackup.Count}");             
             foreach (var kv in Patch.treeBackup)
             {
                 // def.plant.growDays 
@@ -35,6 +58,7 @@ namespace Lilly.PlantsPatch
                 treeSetup.Add(kv.Key, kv.Value.Copy());
                 MyLog.Message($"TreeSetup {kv.Key} {kv.Value}");                
             }
+            MyLog.Message($"TreeSetup {treeSetup.Count}");             
 
         }
     }

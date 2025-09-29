@@ -1,12 +1,34 @@
 ﻿using RimWorld;
+using Verse;
 
 namespace Lilly.PlantsPatch
 
 {
+    public class TreeSetupEntry
+    {
+        public string defName;
+        public MyPlant plant;
+
+        public void ExposeData()
+        {
+            Scribe_Values.Look(ref defName, "defName");
+            Scribe_Values.Look(ref plant, "plant");
+        }
+    }
+
+
     public class MyPlant
     {
-        public float growDays;// 나무 성장 시간
-        public float harvestYield;// 수확량
+        public float growDays=1f;// 나무 성장 시간
+        public float harvestYield=10f;// 수확량
+
+        public MyPlant() { }
+
+        public void ExposeData()
+        {
+            Scribe_Values.Look(ref growDays, "growDays", 30f);
+            Scribe_Values.Look(ref harvestYield, "harvestYield", 25f);
+        }
 
         public MyPlant(MyPlant plant)
         {
