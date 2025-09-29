@@ -35,7 +35,7 @@ namespace Lilly.PlantsPatch
         // 매 프레임마다 호출됨
         public override void DoSettingsWindowContents(Rect inRect)
         {
-            MyLog.Message($"ST {Settings.treeSetup.Count}");
+            //MyLog.Message($"ST {Settings.treeSetup.Count}");
             base.DoSettingsWindowContents(inRect);
 
             var rect = new Rect(0, 0, inRect.width - 16, 1000);

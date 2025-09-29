@@ -6,13 +6,13 @@ namespace Lilly.PlantsPatch
 {
     public class TreeSetupEntry
     {
-        public string defName;
-        public MyPlant plant;
+        public string defName="";
+        public MyPlant plant = new MyPlant();
 
         public void ExposeData()
         {
             Scribe_Values.Look(ref defName, "defName");
-            Scribe_Values.Look(ref plant, "plant");
+            Scribe_Deep.Look(ref plant, "plant");
         }
     }
 
@@ -26,7 +26,7 @@ namespace Lilly.PlantsPatch
 
         public void ExposeData()
         {
-            Scribe_Values.Look(ref growDays, "growDays", 30f);
+            Scribe_Values.Look(ref growDays, "growDays", 1f);
             Scribe_Values.Look(ref harvestYield, "harvestYield", 25f);
         }
 
