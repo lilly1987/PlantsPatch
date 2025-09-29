@@ -60,10 +60,10 @@ namespace Lilly.PlantsPatch
         //    this.harvestYield = other.harvestYield;
         //}
 
-        public MyPlant Copy()
-        {
-            return new MyPlant(this);
-        }
+        //public MyPlant Copy()
+        //{
+        //    return new MyPlant(this);
+        //}
 
         public static MyPlant operator *(MyPlant plant, MyPlant multiplier)
         {

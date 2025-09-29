@@ -22,7 +22,6 @@
     <!-- <li>Mlie.CaptureThem</li> -->
     <li>brrainz.harmony</li>
   </loadAfter>
-  <description> 
-</description>
+  <description>나무 종류별로 성장기간과 수확량 설정</description>
   <modVersion IgnoreIfNoMatchingField="True">1.0.0</modVersion>
 </ModMetaData>

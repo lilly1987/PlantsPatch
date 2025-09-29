@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using Verse;
 
 namespace Lilly.PlantsPatch
@@ -45,6 +46,32 @@ namespace Lilly.PlantsPatch
 
         }
 
+        public static void TreeApply(float? growMultiplier = null, float? yieldMultiplier = null)
+        {
+            foreach (var entry in treeSetup)
+            {
+                if (growMultiplier.HasValue)
+                    entry.Value.growDays *= growMultiplier.Value;
+
+                if (yieldMultiplier.HasValue)
+                    entry.Value.harvestYield *= yieldMultiplier.Value;
+            }
+        }
+
+        public static void TreeReset(float? growMultiplier = null, float? yieldMultiplier = null)
+        {
+            
+            if (growMultiplier.HasValue)
+                foreach (var entry in Patch.treeBackup)
+                    treeSetup[entry.Key].growDays = entry.Value.growDays * growMultiplier.Value;
+
+            if (yieldMultiplier.HasValue)
+                foreach (var entry in Patch.treeBackup)
+                    treeSetup[entry.Key].harvestYield = entry.Value.harvestYield * yieldMultiplier.Value;
+            
+        }
+
+
         /// <summary>
         /// 기본값에서 배율 적용
         /// </summary>
@@ -75,7 +102,8 @@ namespace Lilly.PlantsPatch
             {
                 // def.plant.growDays 
                 // def.plant.harvestYield
-                treeSetup.Add(kv.Key, kv.Value.Copy());
+                if (!treeSetup.ContainsKey(kv.Key))
+                    treeSetup.Add(kv.Key, new MyPlant(kv.Value));
                 MyLog.Message($"TreeSetup {kv.Key} {kv.Value}");                
             }
             MyLog.Message($"TreeSetup {treeSetup.Count}");             

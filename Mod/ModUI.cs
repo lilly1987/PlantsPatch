@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using Verse;
+using static RimWorld.ColonistBar;
 
 namespace Lilly.PlantsPatch
 {
@@ -35,18 +36,18 @@ namespace Lilly.PlantsPatch
 
         // 버튼 정의: 텍스트와 multiplier (null은 기본값 적용)
         (string label, float multiplier)[] buttons = new[]
-{
-                ("x16", 16f),
-                ("x4", 4f),
-                ("x1", 1f),
-                ("/4", 0.25f),
-                ("/16", 0.0625f),
-                ("x16", 16f),
-                ("x4", 4f),
-                ("x1", 1f),
-                ("/4", 0.25f),
-                ("/16", 0.0625f)
-            };
+        {
+            ("reset", 1f),
+            ("x2", 2f),
+            ("x1.25", 1.25f),
+            ("x0.75", 0.75f),
+            ("x0.25", 0.25f),
+            ("reset", 1f),
+            ("x2", 2f),
+            ("x1.25", 1.25f),
+            ("x0.75", 0.75f),
+            ("x0.25", 0.25f),
+        };
 
         // 매 프레임마다 호출됨
         public override void DoSettingsWindowContents(Rect inRect)
@@ -77,80 +78,65 @@ namespace Lilly.PlantsPatch
 
             Widgets.Label(new Rect(rowRect.x, rowRect.y, colWidth, rowRect.height), "일괄 적용".Translate());
 
+            int i = 0;
+            float x = rowRect.x + colWidth + colWidth2 * i;
+            Rect buttonRect = new Rect(x, rowRect.y, colWidth2, rowRect.height);
+
+            if (Widgets.ButtonText(buttonRect, buttons[i].label))
+            {
+                Settings.TreeReset(buttons[i].multiplier);
+                //if (buttons[i].multiplier.HasValue)
+                //Settings.TreeApply(new MyPlant(buttons[i].multiplier));
+                //else
+                //Settings.TreeApply();
+            }
+
             // 버튼 출력
-            for (int i = 0; i <5; i++)
+            for (i = 1; i < 5; i++)
             {
-                float x = rowRect.x + colWidth + colWidth2 * i;
-                Rect buttonRect = new Rect(x, rowRect.y, colWidth2, rowRect.height);
+                x = rowRect.x + colWidth + colWidth2 * i;
+                buttonRect = new Rect(x, rowRect.y, colWidth2, rowRect.height);
 
                 if (Widgets.ButtonText(buttonRect, buttons[i].label))
                 {
+                    Settings.TreeApply(buttons[i].multiplier);
                     //if (buttons[i].multiplier.HasValue)
-                        Settings.TreeApply(new MyPlant(buttons[i].multiplier));
+                    //Settings.TreeApply(new MyPlant(buttons[i].multiplier));
                     //else
-                        //Settings.TreeApply();
+                    //Settings.TreeApply();
                 }
             }
-            for (int i = 5; i < 10; i++)
+
+            i = 5;
+            x = rowRect.x + colWidth + colWidth2 * i;
+            buttonRect = new Rect(x, rowRect.y, colWidth2, rowRect.height);
+
+            if (Widgets.ButtonText(buttonRect, buttons[i].label))
             {
-                float x = rowRect.x + colWidth + colWidth2 * i;
-                Rect buttonRect = new Rect(x, rowRect.y, colWidth2, rowRect.height);
+                Settings.TreeReset(yieldMultiplier: buttons[i].multiplier);
+                //if (buttons[i].multiplier.HasValue)
+                //Settings.TreeApply(new MyPlant(buttons[i].multiplier));
+                //else
+                //Settings.TreeApply();
+            }
+
+            for (i = 6; i < 10; i++)
+            {
+                x = rowRect.x + colWidth + colWidth2 * i;
+                buttonRect = new Rect(x, rowRect.y, colWidth2, rowRect.height);
 
                 if (Widgets.ButtonText(buttonRect, buttons[i].label))
                 {
+                    Settings.TreeApply(yieldMultiplier: buttons[i].multiplier);
                     //if (buttons[i].multiplier.HasValue)
-                        Settings.TreeApply(new MyPlant(harvestYield: buttons[i].multiplier));
+                    //Settings.TreeApply(new MyPlant(harvestYield: buttons[i].multiplier));
                     //else
-                        //Settings.TreeApply();
+                    //Settings.TreeApply();
                 }
-            }
-
-            rowRect = listing.GetRect(30f);
-
-            if (Widgets.ButtonText(new Rect(rowRect.x + colWidth, rowRect.y, colWidth2, rowRect.height), "x16"))
-            {
-                Settings.TreeApply(new MyPlant(16f));
-            }
-            if(Widgets.ButtonText(new Rect(rowRect.x + colWidth+ colWidth2, rowRect.y, colWidth2, rowRect.height), "x4"))
-            {
-                Settings.TreeApply(new MyPlant(4f));
-            }
-            if(Widgets.ButtonText(new Rect(rowRect.x + colWidth + colWidth2 * 2, rowRect.y, colWidth2, rowRect.height), "x1"))
-            {
-                Settings.TreeApply();
-            }
-            if(Widgets.ButtonText(new Rect(rowRect.x + colWidth + colWidth2*3, rowRect.y, colWidth2, rowRect.height), "/4"))
-            {
-                Settings.TreeApply(new MyPlant(1f/4f));
-            }
-            if(Widgets.ButtonText(new Rect(rowRect.x + colWidth + colWidth2*4, rowRect.y, colWidth2, rowRect.height), "/16"))
-            {
-                Settings.TreeApply(new MyPlant(1f/16f));
-            }
-
-            if(Widgets.ButtonText(new Rect(rowRect.x + colWidth + colWidth2 * 5, rowRect.y, colWidth2, rowRect.height), "x16"))
-            {
-                Settings.TreeApply(new MyPlant(harvestYield: 16f));
-            }
-            if(Widgets.ButtonText(new Rect(rowRect.x + colWidth + colWidth2*6, rowRect.y, colWidth2, rowRect.height), "x4"))
-            {
-                Settings.TreeApply(new MyPlant(harvestYield: 4f));
-            }
-            if(Widgets.ButtonText(new Rect(rowRect.x + colWidth + colWidth2 *7, rowRect.y, colWidth2, rowRect.height), "x1"))
-            {
-                Settings.TreeApply();
-            }
-            if(Widgets.ButtonText(new Rect(rowRect.x + colWidth + colWidth2*8, rowRect.y, colWidth2, rowRect.height), "/4"))
-            {
-                Settings.TreeApply(new MyPlant(harvestYield: 1f /4f));
-            }
-            if(Widgets.ButtonText(new Rect(rowRect.x + colWidth + colWidth2*9, rowRect.y, colWidth2, rowRect.height), "/16"))
-            {
-                Settings.TreeApply(new MyPlant(harvestYield: 1f /16f));
             }
 
             listing.GapLine();
-            
+
             // 한 줄 높이의 Rect 확보
             rowRect = listing.GetRect(30f);
 
@@ -158,13 +144,13 @@ namespace Lilly.PlantsPatch
 
             Widgets.Label(new Rect(rowRect.x, rowRect.y, colWidth, rowRect.height), "이름".Translate());
             Widgets.Label(new Rect(rowRect.x + colWidth, rowRect.y, colWidth, rowRect.height), "성장일".Translate());
-            Widgets.Label(new Rect(rowRect.x + colWidth*2, rowRect.y, colWidth, rowRect.height), "수급량".Translate());
+            Widgets.Label(new Rect(rowRect.x + colWidth * 2, rowRect.y, colWidth, rowRect.height), "수급량".Translate());
 
             // ---------
 
             foreach (KeyValuePair<string, MyPlant> item in Settings.treeSetup)
             {
-                TextFieldNumeric(listing, item, colWidth);
+                TextFieldNumeric(listing, item, colWidth, colWidth2);
             }
 
             // ---------
@@ -183,32 +169,41 @@ namespace Lilly.PlantsPatch
             return "Plants Patch".Translate();
         }
 
-        public void TextFieldNumeric(Listing_Standard listing,  KeyValuePair<string, MyPlant> num, float colWidth)
+        public void TextFieldNumeric(Listing_Standard listing, KeyValuePair<string, MyPlant> num, float colWidth, float colWidth2)
         {
             // 한 줄 높이의 Rect 확보
             Rect rowRect = listing.GetRect(30f);
 
-            if (Patch.names.TryGetValue(num.Key,out var value ))
+            if (Patch.names.TryGetValue(num.Key, out var value))
             {
                 Widgets.Label(new Rect(rowRect.x, rowRect.y, colWidth, rowRect.height), value);
-            }else
+            }
+            else
             {
                 Widgets.Label(new Rect(rowRect.x, rowRect.y, colWidth, rowRect.height), num.Key.Translate());
             }
 
+
+            if (Widgets.ButtonText(new Rect(rowRect.x + colWidth, rowRect.y, colWidth2, rowRect.height), "reset"))
+            {
+                Settings.treeSetup[num.Key].growDays = Patch.treeBackup[num.Key].growDays;
+            }
             // 두 번째 열: growDays 입력 필드
             string growStr = num.Value.growDays.ToString();
             Widgets.TextFieldNumeric(
-                new Rect(rowRect.x + colWidth, rowRect.y, colWidth, rowRect.height),
+                new Rect(rowRect.x + colWidth + colWidth2, rowRect.y, colWidth - colWidth2, rowRect.height),
                 ref num.Value.growDays,
                 ref growStr,
                 1f, 100f
             );
-
+            if (Widgets.ButtonText(new Rect(rowRect.x + colWidth * 2, rowRect.y, colWidth2, rowRect.height), "reset"))
+            {
+                Settings.treeSetup[num.Key].harvestYield = Patch.treeBackup[num.Key].harvestYield ;                
+            }
             // 세 번째 열: harvestYield 입력 필드
             string yieldStr = num.Value.harvestYield.ToString();
             Widgets.TextFieldNumeric(
-                new Rect(rowRect.x + colWidth * 2, rowRect.y, colWidth, rowRect.height),
+                new Rect(rowRect.x + colWidth * 2 + colWidth2, rowRect.y, colWidth - colWidth2, rowRect.height),
                 ref num.Value.harvestYield,
                 ref yieldStr,
                 1f, 100f
