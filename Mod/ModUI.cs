@@ -176,11 +176,11 @@ namespace Lilly.PlantsPatch
 
             if (Patch.names.TryGetValue(num.Key, out var value))
             {
-                Widgets.Label(new Rect(rowRect.x, rowRect.y, colWidth, rowRect.height), value);
+                Widgets.Label(new Rect(rowRect.x, rowRect.y, colWidth, rowRect.height), $"{value} , {Settings.treeSetup[num.Key].harvestYield / Settings.treeSetup[num.Key].growDays}");
             }
             else
             {
-                Widgets.Label(new Rect(rowRect.x, rowRect.y, colWidth, rowRect.height), num.Key.Translate());
+                Widgets.Label(new Rect(rowRect.x, rowRect.y, colWidth, rowRect.height), $"{num.Key.Translate()} , {Settings.treeSetup[num.Key].harvestYield / Settings.treeSetup[num.Key].growDays}");
             }
 
 
@@ -194,7 +194,7 @@ namespace Lilly.PlantsPatch
                 new Rect(rowRect.x + colWidth + colWidth2, rowRect.y, colWidth - colWidth2, rowRect.height),
                 ref num.Value.growDays,
                 ref growStr,
-                1f, 100f
+                0.01f
             );
             if (Widgets.ButtonText(new Rect(rowRect.x + colWidth * 2, rowRect.y, colWidth2, rowRect.height), "reset"))
             {
@@ -206,7 +206,7 @@ namespace Lilly.PlantsPatch
                 new Rect(rowRect.x + colWidth * 2 + colWidth2, rowRect.y, colWidth - colWidth2, rowRect.height),
                 ref num.Value.harvestYield,
                 ref yieldStr,
-                1f, 100f
+                0f
             );
 
             //Widgets.Label(listing.GetRect(30f), num.Key.Translate());
