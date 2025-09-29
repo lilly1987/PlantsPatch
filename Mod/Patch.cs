@@ -67,10 +67,10 @@ namespace Lilly.PlantsPatch
                     // def.plant.harvestYield
                     MyPlant value = new MyPlant(def.plant);
                     treeBackup.Add(def.defName, value);
-                    MyLog.Message($"TreeBackup {def.defName} {value}");
+                    MyLog.Message($"TreeBackup {def.defName} {value}", Settings.onDebug);
                     ThingDef tdef = DefDatabase<ThingDef>.GetNamed(def.defName);
                     names.Add(tdef.defName, tdef.label.CapitalizeFirst());                   
-                    MyLog.Message($"TreeBackup {def.defName} {tdef.label.CapitalizeFirst()}");
+                    MyLog.Message($"TreeBackup {def.defName} {tdef.label.CapitalizeFirst()}", Settings.onDebug);
                 }
             }
             MyLog.Message($"TreeBackup {treeBackup.Count}");
@@ -88,12 +88,12 @@ namespace Lilly.PlantsPatch
                 {
                     // def.plant.growDays 
                     // def.plant.harvestYield
-                    MyLog.Message($"TreePatch 1 {def.defName}");
+                    MyLog.Message($"TreePatch 1 {def.defName}", Settings.onDebug);
                     // 설정값 얻기
                     if (Settings.treeSetup.TryGetValue(def.defName, out MyPlant myPlant))
                     {
                         myPlant.ApplyTo(def.plant);
-                        MyLog.Message($"TreePatch 2 {def.defName} {myPlant}");
+                        MyLog.Message($"TreePatch 2 {def.defName} {myPlant}", Settings.onDebug);
                     }
                     //else
                     //{

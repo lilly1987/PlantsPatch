@@ -104,7 +104,7 @@ namespace Lilly.PlantsPatch
                 // def.plant.harvestYield
                 if (!treeSetup.ContainsKey(kv.Key))
                     treeSetup.Add(kv.Key, new MyPlant(kv.Value));
-                MyLog.Message($"TreeSetup {kv.Key} {kv.Value}");                
+                MyLog.Message($"TreeSetup {kv.Key} {kv.Value}", Settings.onDebug);                
             }
             MyLog.Message($"TreeSetup {treeSetup.Count}");             
 
